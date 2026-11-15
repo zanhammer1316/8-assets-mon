@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDX & Market Watchlist</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 4px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+    .chart-box {
+      height: 162px; /* Tuned so 4 rows (8 charts) fit tightly on Android */
+      border-radius: 6px;
+      overflow: hidden;
+      background: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid" id="chart-grid"></div>
+
+  <script>
+    const assets = [
+      "IDX:BBCA",       // Bank Central Asia
+      "IDX:ASII",       // Astra International
+      "IDX:PTBA",       // Bukit Asam
+      "IDX:BSSR",       // Baramulti Suksessarana
+      "IDX:INDF",       // Indofood Sukses Makmur
+      "IDX:ICBP",       // Indofood CBP
+      "FX_IDC:USDIDR",  // USD to IDR Exchange Rate
+      "OANDA:XAUUSD"    // XAU to USD Gold Spot Price
+    ];
+
+    const grid = document.getElementById("chart-grid");
+
+    assets.forEach(symbol => {
+      const box = document.createElement("div");
+      box.className = "chart-box";
+
+      const widgetContainer = document.createElement("div");
+      widgetContainer.className = "tradingview-widget-container";
+      widgetContainer.style.height = "100%";
+      widgetContainer.style.width = "100%";
+
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        "symbol": symbol,
+        "width": "100%",
+        "height": "100%",
+        "locale": "en",
+        "dateRange": "1D", // Change to "1M" or "3M" if preferred
+        "colorTheme": "dark",
+        "isTransparent": false,
+        "autosize": true,
+        "largeChartUrl": ""
+      });
+
+      widgetContainer.appendChild(script);
+      box.appendChild(widgetContainer);
+      grid.appendChild(box);
+    });
+  </script>
+
+</body>
+</html>
