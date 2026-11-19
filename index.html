@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDX & Market Dashboard</title>
+  <title>Market Dashboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -17,11 +17,11 @@
       gap: 3px;
     }
     .chart-box {
-      height: 240px; /* Slightly taller to fit both the header and tabs nicely */
+      height: 240px;
       border-radius: 6px;
       overflow: hidden;
       background: #1e293b;
-      zoom: 0.78; /* Adjust between 0.7 and 0.9 to make text/tabs smaller */
+      zoom: 0.78;
     }
   </style>
 </head>
@@ -29,51 +29,68 @@
 
   <div class="grid" id="chart-grid"></div>
 
-<script>
-  const assets = [
-    "IDX:BBCA",
-    "IDX:ASII",
-    "IDX:PTBA",
-    "IDX:BSSR",
-    "IDX:INDF",
-    "IDX:ICBP",
-    "FX_IDC:USDIDR",
-    "OANDA:XAUUSD"
-  ];
+  <script>
+    const assets = [
+      { symbol: "IDX:BBCA", type: "overview" },
+      { symbol: "IDX:ASII", type: "overview" },
+      { symbol: "IDX:PTBA", type: "overview" },
+      { symbol: "IDX:INDF", type: "overview" },
+      { symbol: "FX_IDC:USDIDR", type: "mini" },
+      { symbol: "OANDA:XAUUSD", type: "mini" }
+    ];
 
-  const grid = document.getElementById("chart-grid");
+    const grid = document.getElementById("chart-grid");
 
-  assets.forEach(symbol => {
-    const box = document.createElement("div");
-    box.className = "chart-box";
+    assets.forEach(item => {
+      const box = document.createElement("div");
+      box.className = "chart-box";
 
-    const widgetContainer = document.createElement("div");
-    widgetContainer.className = "tradingview-widget-container";
-    widgetContainer.style.height = "100%";
-    widgetContainer.style.width = "100%";
+      const widgetContainer = document.createElement("div");
+      widgetContainer.className = "tradingview-widget-container";
+      widgetContainer.style.height = "100%";
+      widgetContainer.style.width = "100%";
 
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-      "symbols": [[symbol]],
-      "chartOnly": false,
-      "width": "100%",
-      "height": "100%",
-      "locale": "en",
-      "colorTheme": "dark",
-      "autosize": true,
-      "showVolume": false,
-      "hideDateRanges": false,
-      "hideMarketStatus": true,
-      "backgroundColor": "rgba(30, 41, 59, 1)",
-      "dateFormat": "MMM dd",       // ← Fixed: added comma
-      "timeFrame": "1Y"
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.async = true;
+
+      if (item.type === "overview") {
+        script.src = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
+        script.innerHTML = JSON.stringify({
+          "symbols": [[item.symbol]],
+          "chartOnly": false,
+          "width": "100%",
+          "height": "100%",
+          "locale": "en",
+          "colorTheme": "dark",
+          "autosize": true,
+          "showVolume": false,
+          "hideDateRanges": false,
+          "hideMarketStatus": true,
+          "backgroundColor": "rgba(30, 41, 59, 1)",
+          "dateFormat": "MMM dd",
+          "timeFrame": "1Y"
+        });
+      } else {
+        script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+        script.innerHTML = JSON.stringify({
+          "symbol": item.symbol,
+          "width": "100%",
+          "height": "100%",
+          "locale": "en",
+          "dateRange": "12M",
+          "colorTheme": "dark",
+          "isTransparent": false,
+          "autosize": true,
+          "largeChartUrl": ""
+        });
+      }
+
+      widgetContainer.appendChild(script);
+      box.appendChild(widgetContainer);
+      grid.appendChild(box);
     });
+  </script>
 
-    widgetContainer.appendChild(script);
-    box.appendChild(widgetContainer);
-    grid.appendChild(box);
-  });
-</script>
+</body>
+</html>
